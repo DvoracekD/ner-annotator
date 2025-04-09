@@ -181,17 +181,17 @@ export const mutations = {
   clearDatasetTags(state) {
     state.datasetTags = [];
   },
-  assignDatasetTagToWordTag(state, { wordTag, datasetTag }) {
-    if (!state.tagAssignments[wordTag]) {
-      state.tagAssignments[wordTag] = [];
+  assignDatasetTagToWordTag(state, { wordTag, datasetTag, text }) {
+    if (!state.tagAssignments[datasetTag]) {
+      state.tagAssignments[datasetTag] = [];
     }
-    if (!state.tagAssignments[wordTag].includes(datasetTag)) {
-      state.tagAssignments[wordTag].push(datasetTag);
+    if (!state.tagAssignments[datasetTag].find(t => t.label === wordTag)) {
+      state.tagAssignments[datasetTag].push({ label: wordTag, text });
     }
   },
   removeDatasetTagFromWordTag(state, { wordTag, datasetTag }) {
-    if (state.tagAssignments[wordTag]) {
-      state.tagAssignments[wordTag] = state.tagAssignments[wordTag].filter(t => t !== datasetTag);
+    if (state.tagAssignments[datasetTag]) {
+      state.tagAssignments[datasetTag] = state.tagAssignments[datasetTag].filter(t => t.label !== wordTag);
     }
   },
 };
@@ -233,7 +233,7 @@ export default {
       enableKeyboardShortcuts: false,
       annotationPrecision: "word",
       datasetTags: [],
-      tagAssignments: {}, // Map of word tag name to array of dataset tag names
+      tagAssignments: {}, // Format: { datasetTag: { label: string, text: string }[] }
       // current state
       currentAnnotation: {},
       currentClass: (tags && tags[0]) || {},

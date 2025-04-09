@@ -78,7 +78,12 @@ export default {
   computed: {
     ...mapState(["datasetTags", "tagAssignments"]),
     assignedDatasetTags() {
-      return this.tagAssignments[this.token.label] || [];
+      return this.datasetTags.filter(tag => 
+        this.tagAssignments[tag]?.some(assignment => assignment.label === this.token.label)
+      );
+    },
+    tokenText() {
+      return this.token.tokens.map(t => t.text).join("");
     }
   },
   methods: {
@@ -92,9 +97,16 @@ export default {
     },
     handleTagUpdate(tag, isChecked) {
       if (isChecked) {
-        this.assignDatasetTagToWordTag({ wordTag: this.token.label, datasetTag: tag });
+        this.assignDatasetTagToWordTag({ 
+          wordTag: this.token.label, 
+          datasetTag: tag,
+          text: this.tokenText
+        });
       } else {
-        this.removeDatasetTagFromWordTag({ wordTag: this.token.label, datasetTag: tag });
+        this.removeDatasetTagFromWordTag({ 
+          wordTag: this.token.label, 
+          datasetTag: tag 
+        });
       }
     }
   }

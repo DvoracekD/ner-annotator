@@ -181,17 +181,24 @@ export const mutations = {
   clearDatasetTags(state) {
     state.datasetTags = [];
   },
-  assignDatasetTagToWordTag(state, { wordTag, datasetTag, text }) {
+  assignDatasetTagToWordTag(state, { tokenId, wordTag, datasetTag, text }) {
     if (!state.tagAssignments[datasetTag]) {
       state.tagAssignments[datasetTag] = [];
     }
-    if (!state.tagAssignments[datasetTag].find(t => t.label === wordTag)) {
-      state.tagAssignments[datasetTag].push({ label: wordTag, text });
+    // Check if this specific token (by ID) is already assigned to this dataset tag
+    if (!state.tagAssignments[datasetTag].find(t => t.tokenId === tokenId)) {
+      state.tagAssignments[datasetTag].push({ 
+        tokenId,
+        label: wordTag, 
+        text 
+      });
     }
   },
-  removeDatasetTagFromWordTag(state, { wordTag, datasetTag }) {
+  removeDatasetTagFromWordTag(state, { tokenId, wordTag, datasetTag }) {
     if (state.tagAssignments[datasetTag]) {
-      state.tagAssignments[datasetTag] = state.tagAssignments[datasetTag].filter(t => t.label !== wordTag);
+      // Filter out only the specific token instance by ID
+      state.tagAssignments[datasetTag] = state.tagAssignments[datasetTag]
+        .filter(t => t.tokenId !== tokenId);
     }
   },
 };

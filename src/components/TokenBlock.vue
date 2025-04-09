@@ -77,9 +77,13 @@ export default {
   },
   computed: {
     ...mapState(["datasetTags", "tagAssignments"]),
+    tokenId() {
+      // Create a unique ID for this specific token instance based on start position and text
+      return `${this.token.start}:${this.token.label}`;
+    },
     assignedDatasetTags() {
       return this.datasetTags.filter(tag => 
-        this.tagAssignments[tag]?.some(assignment => assignment.label === this.token.label)
+        this.tagAssignments[tag]?.some(assignment => assignment.tokenId === this.tokenId)
       );
     },
     tokenText() {
@@ -98,12 +102,14 @@ export default {
     handleTagUpdate(tag, isChecked) {
       if (isChecked) {
         this.assignDatasetTagToWordTag({ 
+          tokenId: this.tokenId,
           wordTag: this.token.label, 
           datasetTag: tag,
           text: this.tokenText
         });
       } else {
         this.removeDatasetTagFromWordTag({ 
+          tokenId: this.tokenId,
           wordTag: this.token.label, 
           datasetTag: tag 
         });

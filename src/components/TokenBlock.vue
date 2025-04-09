@@ -76,10 +76,10 @@ export default {
     };
   },
   computed: {
-    ...mapState(["datasetTags", "tagAssignments"]),
+    ...mapState(["datasetTags", "tagAssignments", "currentIndex"]),
     tokenId() {
-      // Create a unique ID for this specific token instance based on start position and text
-      return `${this.token.start}:${this.token.label}`;
+      // Create a globally unique ID for this specific token instance that works across documents
+      return `doc${this.currentIndex}:${this.token.start}:${this.token.label}`;
     },
     assignedDatasetTags() {
       return this.datasetTags.filter(tag => 

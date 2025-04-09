@@ -62,6 +62,7 @@
         <q-card-section class="row items-center">
           <div class="text-h6">Document Tags for "{{ selectedDatasetTag }}"</div>
           <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -69,16 +70,19 @@
             No document tags are assigned to this dataset tag.
           </div>
           <div v-else>
-            <q-chip
-              v-for="tag in assignedDocumentTags"
-              :key="tag.text"
-              outline
-              square
-              color="grey-7"
-            >
-              {{ tag.text }}
-              <q-tooltip>Label: {{ tag.label }}</q-tooltip>
-            </q-chip>
+            <div v-for="(tags, docIndex) in groupedByDocument" :key="docIndex" class="q-my-md">
+              <div class="text-subtitle2">Document {{parseInt(docIndex.replace('doc', '')) + 1}}:</div>
+              <q-chip
+                v-for="tag in tags"
+                :key="tag.tokenId"
+                outline
+                square
+                color="grey-7"
+              >
+                {{ tag.text }}
+                <q-tooltip>Label: {{ tag.label }}</q-tooltip>
+              </q-chip>
+            </div>
           </div>
         </q-card-section>
 
@@ -100,8 +104,7 @@ export default {
       showNewTagInput: false,
       newTagName: "",
       showDialog: false,
-      selectedDatasetTag: null,
-      selectedTag: null
+      selectedDatasetTag: null
     };
   },
   computed: {
@@ -111,6 +114,22 @@ export default {
       
       // Get all document tags assigned to this dataset tag
       return this.tagAssignments[this.selectedDatasetTag] || [];
+    },
+    groupedByDocument() {
+      // Group document tags by document index for better organization
+      const grouped = {};
+      this.assignedDocumentTags.forEach(tag => {
+        // Extract document index from tokenId (format is 'doc{index}:{start}:{label}')
+        const docIdMatch = tag.tokenId.match(/^doc(\d+):/);
+        if (docIdMatch) {
+          const docId = `doc${docIdMatch[1]}`;
+          if (!grouped[docId]) {
+            grouped[docId] = [];
+          }
+          grouped[docId].push(tag);
+        }
+      });
+      return grouped;
     }
   },
   methods: {

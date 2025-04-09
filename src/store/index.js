@@ -85,16 +85,17 @@ export const mutations = {
         // last sentence
         state.currentIndex += 1;
       }
-      alert("You have completed all the sentences");
+      // alert("You have completed all the sentences");
     }
   },
   previousSentence(state) {
     if (state.currentIndex > 0) {
       state.currentIndex -= 1;
       state.currentAnnotation = state.annotations[state.currentIndex];
-    } else {
-      alert("You are at the beginning of all sentences");
-    }
+    } 
+    // else {
+    //   alert("You are at the beginning of all sentences");
+    // }
   },
   resetIndex(state) {
     state.currentIndex = 0;

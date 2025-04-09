@@ -43,6 +43,7 @@
         label="Save"
         @click="saveTags"
       />
+      <dataset-tags class="q-mt-md" />
     </div>
   </div>
 </template>
@@ -51,6 +52,7 @@ import { mapState, mapMutations } from "vuex";
 import Token from "./Token.vue";
 import TokenBlock from "./TokenBlock.vue";
 import ClassesBlock from "./ClassesBlock.vue";
+import DatasetTags from "./DatasetTags.vue";
 import TokenManager from "./token-manager";
 import TreebankTokenizer from "treebank-tokenizer";
 
@@ -60,6 +62,7 @@ export default {
     Token,
     TokenBlock,
     ClassesBlock,
+    DatasetTags,
   },
   data: function () {
     return {

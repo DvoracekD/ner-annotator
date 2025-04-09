@@ -16,12 +16,14 @@ import { exportFile } from "./utils";
 export default {
   name: "ExportAnnotations",
   computed: {
-    ...mapState(["annotations", "classes"]),
+    ...mapState(["annotations", "classes", "datasetTags", "tagAssignments"]),
   },
   methods: {
     async generateJSONExport() {
       const output = {
         classes: this.classes.map((c) => c.name),
+        datasetTags: this.datasetTags,
+        tagAssignments: this.tagAssignments,
         annotations: this.annotations.map((a) => [
           a.text,
           { entities: a.entities },

@@ -7,21 +7,51 @@
       :key="t.start"
       :token="t"
     />
-    <span class="tag">
+    <span class="tag" @click="showTagMenu">
       {{ token.label }}
+      <small v-if="assignedDatasetTags.length" class="dataset-tags">
+        ({{ assignedDatasetTags.join(", ") }})
+      </small>
       <q-btn
         icon="fa fa-times-circle"
         round
         flat
         size="xs"
         text-color="grey-7"
-        @click="$emit('remove-block', token.start)"
+        @click.stop="$emit('remove-block', token.start)"
       />
     </span>
+    <q-menu v-model="tagMenuOpen" :auto-close="false">
+      <q-list style="min-width: 150px">
+        <q-item-label header>Dataset Tags</q-item-label>
+        <q-item v-if="datasetTags.length === 0">
+          <q-item-section>No dataset tags available</q-item-section>
+        </q-item>
+        <q-item 
+          v-for="tag in datasetTags" 
+          :key="tag"
+          dense
+        >
+          <q-item-section>
+            <q-checkbox
+              :model-value="isTagSelected(tag)"
+              :label="tag"
+              @update:model-value="(val) => handleTagUpdate(tag, val)"
+            />
+          </q-item-section>
+        </q-item>
+        <q-separator />
+        <q-item clickable v-close-popup>
+          <q-item-section>Close</q-item-section>
+        </q-item>
+      </q-list>
+    </q-menu>
   </mark>
 </template>
+
 <script>
 import Token from "./Token.vue";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "TokenBlock",
@@ -31,7 +61,7 @@ export default {
   props: {
     token: {
       type: Object,
-      requried: true,
+      required: true,
     },
     backgroundColor: {
       type: String,
@@ -39,11 +69,35 @@ export default {
     },
   },
   emits: ["remove-block"],
-  data: function () {
+  data() {
     return {
       showClose: false,
+      tagMenuOpen: false,
     };
   },
+  computed: {
+    ...mapState(["datasetTags", "tagAssignments"]),
+    assignedDatasetTags() {
+      return this.tagAssignments[this.token.label] || [];
+    }
+  },
+  methods: {
+    ...mapMutations(["assignDatasetTagToWordTag", "removeDatasetTagFromWordTag"]),
+    showTagMenu(event) {
+      event.stopPropagation();
+      this.tagMenuOpen = true;
+    },
+    isTagSelected(tag) {
+      return this.assignedDatasetTags.includes(tag);
+    },
+    handleTagUpdate(tag, isChecked) {
+      if (isChecked) {
+        this.assignDatasetTagToWordTag({ wordTag: this.token.label, datasetTag: tag });
+      } else {
+        this.removeDatasetTagFromWordTag({ wordTag: this.token.label, datasetTag: tag });
+      }
+    }
+  }
 };
 </script>
 
@@ -62,6 +116,11 @@ mark {
   padding: 4px 0 4px 8px;
   border-radius: 0.25rem;
   font-size: x-small;
+  cursor: pointer;
+}
+.dataset-tags {
+  color: #666;
+  margin-left: 4px;
 }
 .close-btn {
   cursor: pointer;

@@ -152,6 +152,16 @@ export const mutations = {
     state.annotations = newAnnotations;
     state.currentAnnotation = state.annotations[state.currentIndex];
 
+    // Load dataset tags if they exist
+    if (payload.datasetTags && Array.isArray(payload.datasetTags)) {
+      state.datasetTags = payload.datasetTags;
+    }
+
+    // Load tag assignments if they exist
+    if (payload.tagAssignments && typeof payload.tagAssignments === 'object') {
+      state.tagAssignments = payload.tagAssignments;
+    }
+
     for (let c of classes) {
       this.commit("addClass", c);
     }
@@ -159,6 +169,30 @@ export const mutations = {
   },
   switchToPage(state, payload) {
     state.currentPage = payload;
+  },
+  addDatasetTag(state, tag) {
+    if (!state.datasetTags.includes(tag)) {
+      state.datasetTags.push(tag);
+    }
+  },
+  removeDatasetTag(state, tag) {
+    state.datasetTags = state.datasetTags.filter(t => t !== tag);
+  },
+  clearDatasetTags(state) {
+    state.datasetTags = [];
+  },
+  assignDatasetTagToWordTag(state, { wordTag, datasetTag }) {
+    if (!state.tagAssignments[wordTag]) {
+      state.tagAssignments[wordTag] = [];
+    }
+    if (!state.tagAssignments[wordTag].includes(datasetTag)) {
+      state.tagAssignments[wordTag].push(datasetTag);
+    }
+  },
+  removeDatasetTagFromWordTag(state, { wordTag, datasetTag }) {
+    if (state.tagAssignments[wordTag]) {
+      state.tagAssignments[wordTag] = state.tagAssignments[wordTag].filter(t => t !== datasetTag);
+    }
   },
 };
 
@@ -198,6 +232,8 @@ export default {
       separator: "\n",
       enableKeyboardShortcuts: false,
       annotationPrecision: "word",
+      datasetTags: [],
+      tagAssignments: {}, // Map of word tag name to array of dataset tag names
       // current state
       currentAnnotation: {},
       currentClass: (tags && tags[0]) || {},
